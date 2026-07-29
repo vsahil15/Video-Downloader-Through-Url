@@ -1,5 +1,9 @@
 import express from 'express';
-import { download } from '../middlewares/download.middleware.js';
+import { downloadVideo, downloadPlaylist } from "ytsave";
+//const fs = require('fs');
+//const ytdl = require('ytdl-core');
+import fs from 'fs';
+import ytdl from 'ytdl-core';
 
 const router = express.Router();
 
@@ -13,11 +17,19 @@ router.post('/', async (req, res) => {
         });
     }
     try {
-        const filePath = await download(url);
+       /* const filePath = await downloadVideo(url,
+             {
+                format: "mp4",
+                output: "./videos",
+             });*/
+     await  ytdl(url, { quality: 'highest' })
+        .pipe(fs.createWriteStream('video.mp4'))
+        .on('finish', () => {
+        console.log('Download finished!');
+  });
         return res.status(200).json({
             success: true,
-            message: "Downloaded successfully!",
-            path: filePath
+            message: "Downloaded successfully!"
         });
     } catch (err) {
         return res.status(500).json({
