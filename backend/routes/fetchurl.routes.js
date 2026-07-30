@@ -1,8 +1,8 @@
 import express from 'express';
-import fs from 'fs';
-// Use @distube/ytdl-core instead of ytdl-core to avoid 403/410 errors
-import ytdl from '@distube/ytdl-core'; 
+import ytDlpPackage from 'yt-dlp-exec';
+import path from 'path';
 
+const { exec: ytDlp } = ytDlpPackage;
 const router = express.Router();
 
 router.post('/', async (req, res) => {
@@ -16,42 +16,42 @@ router.post('/', async (req, res) => {
         });
     }
 
-    // Validate if the URL is actually a YouTube link
-    if (!ytdl.validateURL(url)) {
-        return res.status(400).json({
-            success: false,
-            message: "Invalid YouTube URL"
-        });
-    }
-
     try {
-        // Wrap the stream in a Promise so 'await' works correctly
-        await new Promise((resolve, reject) => {
-            const downloadStream = ytdl(url, { quality: 'highestvideo' });
-            const fileStream = fs.createWriteStream('video.mp4');
+        const rootDir = process.cwd().endsWith('backend') 
+            ? path.join(process.cwd(), '..') 
+            : process.cwd();
 
-            downloadStream.pipe(fileStream);
+        const exePath = path.join(rootDir, 'yt-dlp.exe');
+        
+        // Changing file extension pattern to mp4 explicitly
+        const outputPattern = path.join(rootDir, '%(title)s.mp4');
 
-            fileStream.on('finish', () => {
-                console.log('Download finished!');
-                resolve();
-            });
+        console.log("Starting full HD video + audio download...");
 
-            // Catch errors on both the network stream and file system stream
-            downloadStream.on('error', (err) => reject(err));
-            fileStream.on('error', (err) => reject(err));
+        await ytDlp(url, {
+            output: outputPattern,
+            // Downloads Best Video and Best Audio separately, then merges them
+            format: 'bv+ba/b', 
+            // Automatically converts the container to an MP4 video file
+            mergeOutputFormat: 'mp4',
+            userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+            noCheckCertificates: true,
+        }, {
+            binaryPath: exePath 
         });
+
+        console.log('Download and track merging finished successfully!');
 
         return res.status(200).json({
             success: true,
-            message: "Downloaded successfully!"
+            message: "Downloaded video with working audio successfully!"
         });
 
     } catch (err) {
-        console.error("Download failed:", err);
+        console.error("yt-dlp download failed:", err);
         return res.status(500).json({
             success: false,
-            message: err.message
+            message: err.stderr || err.message || "An error occurred during download."
         });
     }
 });
