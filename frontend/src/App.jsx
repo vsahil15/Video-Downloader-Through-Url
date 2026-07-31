@@ -24,11 +24,11 @@ function App() {
           <ul className="flex">
             
             {/* YouTube Tab */}
-            <li className="pt-8 pl-8 pr-8 w-1/2 cursor-pointer">
+            <li className="p-8 w-1/2 cursor-pointer">
               <button 
                 type="button"
                 onClick={() => setDownloadmode("youtube")} 
-                className={`w-42 h-10 text-lg font-sans font-normal px-4 py-2 rounded-t-lg transition-colors duration-200
+                className={`w-42 h-10 text-lg font-sans font-normal px-4 py-2 rounded-xl transition-colors duration-200
                   ${downloadMode === "youtube" 
                     ? "bg-sky-600 text-white font-semibold"  
                     : "bg-sky-200 text-black hover:bg-sky-300" 
@@ -39,11 +39,11 @@ function App() {
             </li>
 
             {/* Instagram Tab */}
-            <li className="pt-8 pl-8 pr-8 w-1/2 cursor-pointer">
+            <li className="p-8 w-1/2 cursor-pointer">
               <button 
                 type="button"
                 onClick={() => setDownloadmode("instagram")} 
-                className={`w-42 h-10 text-lg font-sans font-normal px-4 py-2 rounded-t-lg transition-colors duration-200
+                className={`w-42 h-10 text-lg font-sans font-normal px-4 py-2 rounded-xl transition-colors duration-200
                   ${downloadMode === "instagram" 
                     ? "bg-pink-600 text-white font-semibold" 
                     : "bg-pink-300 text-black hover:bg-pink-400" 
