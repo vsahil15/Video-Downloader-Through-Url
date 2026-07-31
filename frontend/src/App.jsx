@@ -1,16 +1,32 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useState } from 'react';
+import API from './api/axios.js';
+import './App.css';
 
 function App() {
   const [downloadMode, setDownloadmode] = useState("youtube");
   const [urlInput, setUrlInput] = useState("");
+  const [error, setError] = useState("");
 
   // --- EMPTY VARIABLES FOR COMPILER ONLY (Add your own logic here) ---
-  const isLoading = false; 
-  const handleDownloadSubmit = (e) => { e.preventDefault(); }; 
+  const [isLoading,setIsLoading] = useState(false); 
+  const handleDownloadSubmit = (e) => {
+    e.preventDefault();
+    setError("");
+    if(!urlInput){
+      setError("Please paste a valid URL before fetching")
+      return;
+    }
+    setIsLoading(true);
+    try{
+      const response= await API.post(`/api/v1/${downloadMode}`,{
+        url: urlInput,
+        mode: downloadMode
+      });
+    
+    }catch(err){
+      console.log(err.message);
+    }
+   }; 
   // -------------------------------------------------------------------
 
   console.log("which mode the user is using", downloadMode);
@@ -57,8 +73,11 @@ function App() {
         </div>
 
         {/* Form elements styled explicitly with text and background visibility rules */}
-        <div className="bg-white p-6 rounded-b-lg shadow-md border border-gray-200 text-left">
-           <form onSubmit={handleDownloadSubmit} className="space-y-4">
+        <div className={`p-6 rounded-2xl text-left transition-all duration-300 bg-sky-50 border-2
+   ${downloadMode === "youtube" 
+     ? "border-sky-500 [box-shadow:0_10px_30px_-10px_rgba(14,165,233,0.3)]" 
+     : "border-pink-500 [box-shadow:0_10px_30px_-10px_rgba(236,72,153,0.3)]"}`}>
+           <form onSubmit={handleDownloadSubmit} className="space-y-4 ">
                 <label htmlFor="urlinput" className="block font-medium text-gray-700 capitalize">
                   Paste your {downloadMode || 'video'} link here:
                 </label>
@@ -86,6 +105,12 @@ function App() {
                     {isLoading ? "Fetching..." : "Fetch"}
                   </button>
                 </div>
+
+            {error && (
+            <p className="text-sm text-red-600 font-medium mt-1">
+            ⚠️ {error}
+            </p>
+             )}        
             </form>
          </div>
       </section>
