@@ -28,6 +28,13 @@
     "fs": "^0.0.1-security",
     "youtubei.js": "^17.2.0",
     "yt-dlp-exec": "^1.0.2",
+    "ytdl-core-muxer": "^1.0.1",
     "ytsave": "^1.0.7"
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "*-player-script.js",
+      "*-base.js"
+    ]
   }
 }
