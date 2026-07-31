@@ -1,6 +1,8 @@
 import express from 'express';
 import ytDlpPackage from 'yt-dlp-exec';
 import path from 'path';
+import fs from 'fs'; 
+
 
 const { exec: ytDlp } = ytDlpPackage;
 const router = express.Router();
@@ -24,11 +26,12 @@ router.post('/', async (req, res) => {
         const exePath = path.join(rootDir, 'yt-dlp.exe');
         
         // Changing file extension pattern to mp4 explicitly
-        const outputPattern = path.join(rootDir, '%(title)s.mp4');
+          const tempFileName = `download-${Date.now()}.mp4`;
+        const outputPattern = path.join(rootDir, tempFileName);
 
         console.log("Starting full HD video + audio download...");
 
-        await ytDlp(url, {
+    const fetchdata=  await ytDlp(url, {
             output: outputPattern,
             // Downloads Best Video and Best Audio separately, then merges them
             format: 'bv+ba/b', 
@@ -40,14 +43,21 @@ router.post('/', async (req, res) => {
             binaryPath: exePath 
         });
 
-        console.log('Download and track merging finished successfully!');
+        console.log('Download and track merging finished successfully!',fetchdata);
+        
+        return res.download(outputPattern,'video.mp4',(err)=>{
+            if(err){
+                console.error("Error sending file:", err);
+            }
 
-        return res.status(200).json({
-            success: true,
-            message: "Downloaded video with working audio successfully!"
-        });
 
-    } catch (err) {
+         if (fs.existsSync(outputPattern)) {
+         fs.unlinkSync(outputPattern);
+         console.log("Temporary file cleared from server disk space.");
+         }
+       });
+     } 
+     catch (err) {
         console.error("yt-dlp download failed:", err);
         return res.status(500).json({
             success: false,

@@ -9,7 +9,7 @@ function App() {
 
   // --- EMPTY VARIABLES FOR COMPILER ONLY (Add your own logic here) ---
   const [isLoading,setIsLoading] = useState(false); 
-  const handleDownloadSubmit = (e) => {
+  const handleDownloadSubmit = async(e) => {
     e.preventDefault();
     setError("");
     if(!urlInput){
@@ -21,8 +21,25 @@ function App() {
       const response= await API.post(`/api/v1/${downloadMode}`,{
         url: urlInput,
         mode: downloadMode
-      });
-    
+      },
+       { responseType: 'blob' } 
+    );
+     const blob = new Blob([response.data], { type: 'video/mp4' });
+      const downloadUrl = window.URL.createObjectURL(blob);
+      
+      // 3. Declaratively trigger a click download event hidden in the background
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.setAttribute('download', `${downloadMode}-video.mp4`); // Set file layout name
+      document.body.appendChild(link);
+      link.click();
+      
+      // 4. Cleanup memory pointers
+      link.parentNode.removeChild(link);
+      window.URL.revokeObjectURL(downloadUrl);
+      
+      setUrlInput(""); // Reset input text bar layout
+      alert("Download completed and saved to your device!");
     }catch(err){
       console.log(err.message);
     }
