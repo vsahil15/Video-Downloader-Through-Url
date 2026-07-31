@@ -11,7 +11,6 @@ app.get('/', (req, res) => {
         message: "successfully server started"
     });
 });
-
 app.use('/fetch_url', fetchurlRouter);
 
 export default app;
