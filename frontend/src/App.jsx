@@ -119,7 +119,7 @@ function App() {
                     disabled={isLoading} 
                     className="px-6 py-3 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors shadow-sm disabled:bg-purple-400 disabled:cursor-not-allowed"
                   >
-                    {isLoading ? "Fetching..." : "Fetch"}
+                    {isLoading ? "Downloading..." : "Download"}
                   </button>
                 </div>
 
